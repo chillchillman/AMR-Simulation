@@ -1,0 +1,22 @@
+{
+  "Items": [
+    {
+      "vehicleName": "Vehicle 1",
+      "speed": 3.5,
+      "batteryLevel": 85.0,
+      "status": "Idle"
+    },
+    {
+      "vehicleName": "Vehicle 2",
+      "speed": 5.0,
+      "batteryLevel": 60.0,
+      "status": "Moving"
+    },
+    {
+      "vehicleName": "Vehicle 3",
+      "speed": 2.0,
+      "batteryLevel": 45.0,
+      "status": "Charging"
+    }
+  ]
+}
