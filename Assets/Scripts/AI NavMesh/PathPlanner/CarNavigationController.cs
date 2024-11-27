@@ -7,6 +7,11 @@ public class CarNavigationController : MonoBehaviour
 {
     private NavMeshAgent navMeshAgent;
     private bool isMoving = false;
+//----------------------------------------------------------------
+    public Animator carAnimator; // 連結Animator
+    public string animationTrigger = "Pickup"; // 動畫參數名稱
+    private Transform currentTargetObject; // 目標貨物的Transform
+//----------------------------------------------------------------
 
     private void Start()
     {
@@ -72,14 +77,53 @@ public class CarNavigationController : MonoBehaviour
             {
                 yield return null;
             }
+
+            //----------------------------------------------------------------
+            if(currentTargetObject != null)
+            {
+                FaceTarget(currentTargetObject);
+                PlayPickupAnimation();
+                yield return new WaitForSeconds(2.0f);
+            }
+            //----------------------------------------------------------------
         }
 
         isMoving = false;
         Debug.Log("Navigation completed!");
     }
 
+//----------------------------------------------------------------
+    private void FaceTarget(Transform target)
+    {
+        Vector3 direction = (target.position - transform.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * navMeshAgent.angularSpeed);
+        Debug.Log($"Facing target: {target.name}");
+    }
+//---------------------------------------------------------------
+
+    private void PlayPickupAnimation()
+    {
+        if (carAnimator != null)
+        {
+            carAnimator.SetTrigger(animationTrigger);
+            Debug.Log("Pickup animation triggered.");
+        }
+        else
+        {
+            Debug.LogWarning("Animator not assigned to Car.");
+        }
+    }
+ //------------------------------------------------------------   
+
     private void OnWaypointsUpdated()
     {
         Debug.Log("Waypoints updated.");
+    }
+
+    public void SetTargetObject(Transform targetObject)
+    {
+        currentTargetObject = targetObject;
+        Debug.Log($"Target object set to: {targetObject.name}");
     }
 }
