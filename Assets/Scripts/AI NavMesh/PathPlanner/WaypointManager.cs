@@ -7,7 +7,9 @@ public class WaypointManager : MonoBehaviour
     public static WaypointManager Instance { get; private set; }
 
     private List<Vector3> waypoints = new List<Vector3>(); //所有目標點 (包含起點 終點 waypoint)
-    public event Action OnWaypointsUpdated;
+    
+    public delegate void WaypointsUpdated();
+    public event WaypointsUpdated OnWaypointsUpdated;
 
     [Header("Preset Points")]
     [SerializeField] private Transform startPoint; 
@@ -102,6 +104,38 @@ public class WaypointManager : MonoBehaviour
     {
         return new List<Vector3>(waypoints);
     }
+
+
+    /// <summary>
+    /// 生成距離矩陣
+    /// </summary>
+    public float[,] GenerateDistanceMatrix()
+    {
+        int count = waypoints.Count;
+        float[,] distanceMatrix = new float[count, count];
+
+        for (int i = 0; i < count; i++)
+        {
+            for (int j = 0; j < count; j++)
+            {
+                if (i == j)
+                {
+                    distanceMatrix[i, j] = 0; // 自身距離為0
+                }
+                else
+                {
+                    Vector3 posA = waypoints[i];
+                    Vector3 posB = waypoints[j];
+                    distanceMatrix[i, j] = Vector3.Distance(posA, posB);
+                }
+            }
+        }
+
+        return distanceMatrix;
+    }
+
+    //----------------------------------------------------------------
+
 
     public void ClearWaypoints()
     {
