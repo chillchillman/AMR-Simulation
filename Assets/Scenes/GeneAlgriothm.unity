@@ -4470,21 +4470,15 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 334107617}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b9608bf5a0d443648d6762ce0f37877, type: 3}
+  m_Script: {fileID: 11500000, guid: 7e2b3cd7afff0444cbcd0df8af5c0ad7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  populationSize: 20
-  geneLength: 9
-  maxGenerations: 100
-  crossoverRate: 0.7
-  mutationRate: 0.01
-  vehicleCapacity: 100
-  maxDistance: 300
-  energyConsumptionPerUnitDistance: 0.1
-  timePerUnitDistance: 1
-  customerDemands: 0a000000140000001e00000028000000320000003c00000046000000500000005a000000
+  initialAMRCount: 2
+  maxAMRCount: 10
+  populationSize: 100
+  maxGenerations: 30
 --- !u!1 &338642984
 GameObject:
   m_ObjectHideFlags: 0
