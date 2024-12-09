@@ -23,7 +23,7 @@ public class WaypointTester : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.D))
         {
-            float[,] distanceMatrix = WaypointManager.Instance.GenerateDistanceMatrix();
+            float[,] distanceMatrix = WaypointManager.Instance.GenerateFullDistanceMatrix();
             Debug.Log("Distance Matrix:");
 
             for (int i = 0; i < distanceMatrix.GetLength(0); i++)

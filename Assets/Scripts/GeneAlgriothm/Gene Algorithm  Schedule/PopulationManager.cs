@@ -16,15 +16,27 @@ public class PopulationManager : MonoBehaviour {
     private int optimalAMRCount;
     private float shortestTotalDistance;
 
+    public GeneResultDisplayManager geneResultDisplayManager;
+
     void Start() {
         // 獲取距離矩陣
-        distanceMatrix = WaypointManager.Instance.GenerateDistanceMatrix();
+        distanceMatrix = WaypointManager.Instance.GenerateFullDistanceMatrix();
 
         // 開始優化流程
         RunOptimization();
     }
 
-    void RunOptimization() {
+    public void SetParameters(int initialAMRCount, int maxAMRCount, int populationSize, int maxGenerations)
+    {
+        this.initialAMRCount = initialAMRCount;
+        this.maxAMRCount = maxAMRCount;
+        this.populationSize = populationSize;
+        this.maxGenerations = maxGenerations;
+
+        Debug.Log($"Parameters updated: InitialAMRCount:{initialAMRCount}, MaxAMRCount:{maxAMRCount}, PopulationSize:{populationSize}, MaxGenerations:{maxGenerations}");
+    }
+
+    public void RunOptimization() {
         optimalAMRCount = initialAMRCount;
         float bestFitness = float.MinValue;
         float previousShortestDistance = float.MaxValue;
@@ -35,15 +47,16 @@ public class PopulationManager : MonoBehaviour {
             Debug.Log($"Testing with {amrCount} AMRs...");
 
             // 使用基因演算法運行當前 AMR 數量的測試
-            float fitness = RunGeneticAlgorithm(amrCount);
+            var (fitness, bestDNA) = RunGeneticAlgorithm(amrCount);
 
             // 獲取最佳總路徑長
             float currentShortestDistance = -fitness;
 
             // 檢查新增車輛是否有效縮短路徑且所有車輛均被使用
-            if (currentShortestDistance < previousShortestDistance && AllVehiclesUsed(amrCount, optimalDNA)) {
+            if (currentShortestDistance < previousShortestDistance && AllVehiclesUsed(amrCount, bestDNA)) {
                 bestFitness = fitness;
                 optimalAMRCount = amrCount;
+                optimalDNA = bestDNA;
                 previousShortestDistance = currentShortestDistance;
             } else {
                 Debug.Log($"Adding {amrCount} AMRs does not improve the total distance or not all vehicles are used.");
@@ -53,6 +66,15 @@ public class PopulationManager : MonoBehaviour {
 
         Debug.Log($"Optimal AMR Count: {optimalAMRCount}, Shortest Total Distance: {previousShortestDistance}");
         Debug.Log($"Optimal DNA Configuration: {optimalDNA}");
+
+        DisplayOptimalDNA(optimalAMRCount);
+
+        // 顯示最佳結果到 UI
+        if (geneResultDisplayManager != null)
+        {
+            float totalDistance = -optimalDNA.Fitness;
+            geneResultDisplayManager.DisplayResults(optimalAMRCount, optimalDNA, totalDistance);
+        }
     }
 
     bool AllVehiclesUsed(int amrCount, DNA dna) {
@@ -64,9 +86,10 @@ public class PopulationManager : MonoBehaviour {
         return assignedVehicles.Count == amrCount;
     }
 
-    float RunGeneticAlgorithm(int amrCount) {
+    (float fitness, DNA bestDNA)RunGeneticAlgorithm(int amrCount) {
         List<DNA> population = InitializePopulation(amrCount);
         float bestFitness = float.MinValue;
+        DNA bestDNA = null; //保存最佳基因排序
 
         for (generation = 1; generation <= maxGenerations; generation++) {
             // 計算適應度
@@ -83,14 +106,14 @@ public class PopulationManager : MonoBehaviour {
             // 更新最佳適應度
             if (population[0].Fitness > bestFitness) {
                 bestFitness = population[0].Fitness;
-                optimalDNA = population[0]; // 保存當前最佳基因
+                bestDNA = population[0]; // 保存當前最佳基因
             }
 
             // 繁殖下一代
             population = BreedNewPopulation(population);
         }
 
-        return bestFitness;
+        return (bestFitness, bestDNA);
     }
 
     List<DNA> BreedNewPopulation(List<DNA> sortedPopulation) {
@@ -140,4 +163,39 @@ public class PopulationManager : MonoBehaviour {
         Debug.Log($"Best Fitness: {bestDNA.Fitness} (Total Distance: {-bestDNA.Fitness})");
         Debug.Log($"Best DNA: {bestDNA}");
     }
+    
+
+    void DisplayOptimalDNA(int amrCount) {
+        if (optimalDNA == null) {
+           Debug.Log("No optimal DNA found.");
+            return;
+        }
+
+        float totalDistance = -optimalDNA.Fitness;
+
+        // 獲取最佳基因的分配路徑
+        List<List<int>> amrRoutes = new List<List<int>>();
+        for (int i = 0; i < amrCount; i++) {
+            amrRoutes.Add(new List<int>());
+       }
+        for (int i = 0; i < optimalDNA.GetGenes().Count; i++) {
+            amrRoutes[optimalDNA.GetGenes()[i]].Add(i + 1); // 分配到對應車輛
+        }
+
+        // 打印最佳基因的路徑排程
+        Debug.Log("Optimal DNA Configuration:");
+        Debug.Log($"Total Distance: {totalDistance}");
+
+       for (int i = 0; i < amrRoutes.Count; i++) {
+           if (amrRoutes[i].Count > 0) {
+                string route = "Start -> ";
+                route += string.Join(" -> ", amrRoutes[i].Select(index => $"Waypoint {index}"));
+                route += " -> End";
+               Debug.Log($"AMR {i + 1} Route: {route}");
+           } else {
+               Debug.Log($"AMR {i + 1} Route: Start -> End (No Waypoints)");
+           }
+       }
+    }
+
 }
