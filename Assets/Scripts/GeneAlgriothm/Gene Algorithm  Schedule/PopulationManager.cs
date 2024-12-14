@@ -12,8 +12,8 @@ public class PopulationManager : MonoBehaviour {
     private int generation;
 
     // 儲存最佳結果
-    private DNA optimalDNA;
-    private int optimalAMRCount;
+    public DNA optimalDNA;
+    public int optimalAMRCount;
     private float shortestTotalDistance;
 
     public GeneResultDisplayManager geneResultDisplayManager;
@@ -75,6 +75,18 @@ public class PopulationManager : MonoBehaviour {
             float totalDistance = -optimalDNA.Fitness;
             geneResultDisplayManager.DisplayResults(optimalAMRCount, optimalDNA, totalDistance);
         }
+
+        // 調用生成車輛並設置導航路徑
+        CarSpawnerAndRouteSetter carSpawner = FindObjectOfType<CarSpawnerAndRouteSetter>();
+        if (carSpawner != null)
+        {
+            carSpawner.GenerateCarsAndSetRoutes();
+        }
+        else
+        {
+            Debug.LogError("CarSpawnerAndRouteSetter not found in the scene!");
+        }
+
     }
 
     bool AllVehiclesUsed(int amrCount, DNA dna) {

@@ -12,17 +12,20 @@ public class CarNavigationController : MonoBehaviour
     public string animationTrigger = "Pickup"; // 動畫參數名稱
     private Transform currentTargetObject; // 目標貨物的Transform
 //----------------------------------------------------------------
+    private int carIndex; // 車輛的索引
+    private List<Vector3> assignedRoute; // 分配的導航路徑
+
 
     private void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
-        WaypointManager.Instance.OnWaypointsUpdated += OnWaypointsUpdated;
+        // WaypointManager.Instance.OnWaypointsUpdated += OnWaypointsUpdated;
     }
 
-    private void OnDestroy()
-    {
-        WaypointManager.Instance.OnWaypointsUpdated -= OnWaypointsUpdated;
-    }
+    // private void OnDestroy()
+    // {
+    //     WaypointManager.Instance.OnWaypointsUpdated -= OnWaypointsUpdated;
+    // }
 
     public void SetSpeed(float speed)
     {
@@ -42,31 +45,38 @@ public class CarNavigationController : MonoBehaviour
         Debug.Log($"Acceleration set to {acceleration}");
     }
 
+    // 設置導航路徑
+    public void SetNavigationRoute(List<Vector3> route)
+    {
+        assignedRoute = route;
+        Debug.Log($"Car {carIndex} assigned route with {route.Count} waypoints.");
+    }
+
+    // 開始導航
     public void StartNavigation()
     {
-        List<Vector3> waypoints = WaypointManager.Instance.GetWaypointPositions();
-        if (waypoints.Count == 0)
+        if (assignedRoute == null || assignedRoute.Count == 0)
         {
-            Debug.LogWarning("No waypoints available for navigation.");
+            Debug.LogWarning($"Car {carIndex} has no navigation route assigned.");
             return;
         }
 
         isMoving = true;
-        StartCoroutine(NavigateThroughWaypoints(waypoints));
+        StartCoroutine(NavigateThroughWaypoints(assignedRoute));
     }
 
-    public void StopNavigation()
+     public void StopNavigation()
     {
         if (isMoving)
         {
             StopAllCoroutines();
             navMeshAgent.ResetPath();
             isMoving = false;
-            Debug.Log("Navigation stopped.");
+            Debug.Log($"Car {carIndex} navigation stopped.");
         }
     }
 
-    private IEnumerator NavigateThroughWaypoints(List<Vector3> waypoints)
+    public IEnumerator NavigateThroughWaypoints(List<Vector3> waypoints)
     {
         foreach (var point in waypoints)
         {
@@ -125,5 +135,18 @@ public class CarNavigationController : MonoBehaviour
     {
         currentTargetObject = targetObject;
         Debug.Log($"Target object set to: {targetObject.name}");
+    }
+
+    // 新增方法：設置車輛索引
+    public void SetCarIndex(int index)
+    {
+        carIndex = index;
+        Debug.Log($"Car index set to: {carIndex}");
+    }
+
+    // 獲取車輛索引
+    public int GetCarIndex()
+    {
+        return carIndex;
     }
 }

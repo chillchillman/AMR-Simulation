@@ -722,7 +722,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Data 2
+  m_text: Schedule
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2242,7 +2242,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &140647959
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4132,6 +4132,7 @@ GameObject:
   - component: {fileID: 236973846}
   - component: {fileID: 236973847}
   - component: {fileID: 236973848}
+  - component: {fileID: 236973849}
   m_Layer: 0
   m_Name: WaypointManager
   m_TagString: Untagged
@@ -4199,6 +4200,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c6215d78672b4e56a0e7b2c33d28a90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &236973849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 236973844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fbc3e2ccc25342469e127c9bb5a1ee1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  carPrefab: {fileID: 1451200903}
+  carParent: {fileID: 472580869}
 --- !u!1 &238442547
 GameObject:
   m_ObjectHideFlags: 0
@@ -5487,7 +5502,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &306781825
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5699,6 +5714,7 @@ MonoBehaviour:
   maxAMRCount: 5
   populationSize: 500
   maxGenerations: 50
+  optimalAMRCount: 0
   geneResultDisplayManager: {fileID: 334107622}
 --- !u!114 &334107621
 MonoBehaviour:
@@ -7013,6 +7029,18 @@ MonoBehaviour:
       - m_Target: {fileID: 1451200907}
         m_TargetAssemblyTypeName: CarNavigationController, Assembly-CSharp
         m_MethodName: StartNavigation
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 236973849}
+        m_TargetAssemblyTypeName: CarSpawnerAndRouteSetter, Assembly-CSharp
+        m_MethodName: StartAllCars
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8454,6 +8482,37 @@ PrefabInstance:
       addedObject: {fileID: 2072106749}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 90736d42853bf4318a1e31daaa307f37, type: 3}
+--- !u!1 &472580868
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 472580869}
+  m_Layer: 0
+  m_Name: Car Parent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &472580869
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 472580868}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -28.28, y: 1, z: -16.39}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &475864388 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 347d0f919c1de4af38d43796fa9eda2a, type: 3}
@@ -11769,7 +11828,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Data 3
+  m_text: 'Data '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -16936,7 +16995,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Data 1
+  m_text: Setting
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -24100,7 +24159,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 1451200903}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 3
+  m_Radius: 2
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -32645,6 +32704,7 @@ SceneRoots:
   - {fileID: 720150635}
   - {fileID: 1442381911}
   - {fileID: 1451200905}
+  - {fileID: 472580869}
   - {fileID: 464407088}
   - {fileID: 789113773}
   - {fileID: 202067111}
