@@ -12,6 +12,9 @@ public class UIController : MonoBehaviour
     public Image Fuc2left_img;
     public Image Fuc2right_img;
 
+    public Image Fuc3left_img;
+    public Image Fuc3right_img;
+
     public Image headT_img;
     public Image headB_img;
     // public Button Fuc1_btn;
@@ -35,6 +38,8 @@ public class UIController : MonoBehaviour
         Fuc1right_img.transform.DOLocalMoveX(70 + 492, 0);
         Fuc2left_img.transform.DOLocalMoveX(-70 - 492, 0);
         Fuc2right_img.transform.DOLocalMoveX(70 + 492, 0);
+        Fuc3left_img.transform.DOLocalMoveX(-70 - 492, 0);
+        Fuc3right_img.transform.DOLocalMoveX(70 + 492, 0);
     }
 
     public void Fuc1_Click()
@@ -49,6 +54,13 @@ public class UIController : MonoBehaviour
         ResetUI();
         Fuc2left_img.transform.DOLocalMoveX(60 - 492, 0.5f);
         Fuc2right_img.transform.DOLocalMoveX(-60 + 492, 0.5f);
+    }
+
+    public void Fuc3_Click()
+    {
+        ResetUI();
+        Fuc3left_img.transform.DOLocalMoveX(60 - 492, 0.5f);
+        Fuc3right_img.transform.DOLocalMoveX(-60 + 492, 0.5f);
     }
 
     public void Logoset()

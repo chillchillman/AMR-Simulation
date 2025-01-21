@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System.IO;
 
 public class PopulationManager : MonoBehaviour {
     public int initialAMRCount = 1;
@@ -17,6 +18,9 @@ public class PopulationManager : MonoBehaviour {
     private float shortestTotalDistance;
 
     public GeneResultDisplayManager geneResultDisplayManager;
+
+    private List<float> fitnessHistory = new List<float>();
+
 
     void Start() {
         // 獲取距離矩陣
@@ -48,6 +52,8 @@ public class PopulationManager : MonoBehaviour {
 
             // 使用基因演算法運行當前 AMR 數量的測試
             var (fitness, bestDNA) = RunGeneticAlgorithm(amrCount);
+
+            SaveFitnessToExcel();
 
             // 獲取最佳總路徑長
             float currentShortestDistance = -fitness;
@@ -87,6 +93,7 @@ public class PopulationManager : MonoBehaviour {
             Debug.LogError("CarSpawnerAndRouteSetter not found in the scene!");
         }
 
+        
     }
 
     bool AllVehiclesUsed(int amrCount, DNA dna) {
@@ -96,6 +103,21 @@ public class PopulationManager : MonoBehaviour {
             assignedVehicles.Add(gene);
         }
         return assignedVehicles.Count == amrCount;
+    }
+
+    public void SaveFitnessToExcel()
+    {
+        string filePath = Path.Combine(Application.dataPath, "FitnessData.csv");
+
+        using (StreamWriter sw = new StreamWriter(filePath))
+        {
+            sw.WriteLine("Generation,Fitness");
+            foreach (var fitness in fitnessHistory)
+            {
+                sw.WriteLine($"{generation},{fitness}");
+            }
+        }
+
     }
 
     (float fitness, DNA bestDNA)RunGeneticAlgorithm(int amrCount) {
@@ -111,6 +133,8 @@ public class PopulationManager : MonoBehaviour {
 
             // 按適應度排序
             population = population.OrderByDescending(dna => dna.Fitness).ToList();
+
+            fitnessHistory.Add(population[0].Fitness);
 
             // 打印最佳結果
             LogBestResult(population, amrCount);

@@ -52,6 +52,11 @@ public class CarNavigationController : MonoBehaviour
         Debug.Log($"Car {carIndex} assigned route with {route.Count} waypoints.");
     }
 
+    public List<Vector3> GetNavigationRoute()
+    {
+        return assignedRoute;
+    }
+
     // 開始導航
     public void StartNavigation()
     {

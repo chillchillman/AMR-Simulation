@@ -1,12 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CarAnimationController : MonoBehaviour
 {
     private Animator animator;
-    private bool isTriggeredUP = false;
-    private bool isTriggeredDOWN = false;
 
     private void Start()
     {
@@ -17,39 +13,36 @@ public class CarAnimationController : MonoBehaviour
         }
     }
 
+    public void TriggerAnimation(string animationState)
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger(animationState);
+            Debug.Log($"Triggered animation: {animationState}");
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-
         if (other.CompareTag("Waypoint"))
         {
-            Debug.Log("Car has entered the trigger zone!");
-            isTriggeredUP = true;   
-            isTriggeredDOWN = false;
-            UpdateAnimationState(); 
+            Waypoint waypoint = other.GetComponent<Waypoint>();
+            if (waypoint != null && waypoint.AssignedCar == gameObject)
+            {
+                TriggerAnimation("WaypointEnter");
+            }
         }
-        Debug.Log($"OnTriggerEnter called with object: {other.name}");
     }
 
     private void OnTriggerExit(Collider other)
     {
-
         if (other.CompareTag("Waypoint"))
         {
-            Debug.Log("Car has left the trigger zone~");
-            isTriggeredUP = false; 
-            isTriggeredDOWN = true;
-            UpdateAnimationState(); 
-        }
-        Debug.Log($"OnTriggerExit called with object: {other.name}");
-    }
-
-    private void UpdateAnimationState()
-    {
-        // 更新Animator参数
-        if (animator != null)
-        {
-            animator.SetBool("isTriggeredUP", isTriggeredUP);
-            animator.SetBool("isTriggeredDown", isTriggeredDOWN);
+            Waypoint waypoint = other.GetComponent<Waypoint>();
+            if (waypoint != null && waypoint.AssignedCar == gameObject)
+            {
+                TriggerAnimation("WaypointExit");
+            }
         }
     }
 }
