@@ -4,10 +4,10 @@ using UnityEngine;
 using System.IO;
 
 public class PopulationManager : MonoBehaviour {
-    public int initialAMRCount = 1;
-    public int maxAMRCount = 5;
-    public int populationSize = 50;
-    public int maxGenerations = 10;
+    public int initialAMRCount = 0;
+    public int maxAMRCount = 0;
+    public int populationSize = 0;
+    public int maxGenerations = 0;
 
     private float[,] distanceMatrix;
     private int generation;

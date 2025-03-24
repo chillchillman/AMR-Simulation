@@ -7,15 +7,17 @@ public class WaypointManager : MonoBehaviour
     public static WaypointManager Instance { get; private set; }
 
     private List<Vector3> waypoints = new List<Vector3>(); //所有目標點 (包含起點 終點 waypoint)
-    private Vector3 startPoint;
-    private Vector3 endPoint;
+    private List<Vector3> startPoints = new List<Vector3>();
+    private List<Vector3> endPoints = new List<Vector3>();
+    private HashSet<int> usedStartPointIndices = new HashSet<int>();
+    private HashSet<int> usedEndPointIndices = new HashSet<int>();
     
     public delegate void WaypointsUpdated();
     public event WaypointsUpdated OnWaypointsUpdated;
 
     [Header("Preset Points")]
-    [SerializeField] private Transform startPointTransform; 
-    [SerializeField] private Transform endPointTransform;
+    [SerializeField] private Transform[] startPointTransform; 
+    [SerializeField] private Transform[] endPointTransform;
     [SerializeField] private Transform[] targetPoints; // 其他目標point(不包括start final 的 waypoint)
 
 
@@ -27,33 +29,6 @@ public class WaypointManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    // private void Update()
-    // {
-    //     if (Input.GetMouseButtonDown(0)) // 檢測鼠標左鍵點擊
-    //     {
-    //         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-    //         if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, waypointLayerMask))
-    //         {
-    //             AddWaypoint(hit.point);
-    //         }
-    //     }
-    // }
-
-    // public void AddWaypoint(Vector3 position)
-    // {
-    //     if (waypoints.Contains(position))
-    //     {
-    //         Debug.LogWarning($"Waypoint already exists at position: {position}");
-    //         return;
-    //     }
-
-    //     waypoints.Add(position);
-    //     OnWaypointsUpdated?.Invoke();
-    //     Debug.Log($"Waypoint added at position: {position}");
-
-    //     // 顯示當前所有 Waypoints 的記錄
-    //     DisplayWaypoints();
-    // }
 
     private void Start()
     {
@@ -62,19 +37,32 @@ public class WaypointManager : MonoBehaviour
 
     private void InitializeWaypoints()
     {
+        // 初始化 startPoints
+        startPoints.Clear();
+        usedStartPointIndices.Clear();
+        if (startPointTransform != null && startPointTransform.Length > 0)
+        {
+            foreach (var startTransform in startPointTransform)
+            {
+                if (startTransform != null)
+                    startPoints.Add(startTransform.position);
+            }
+        }
 
-        if (startPointTransform != null) startPoint = startPointTransform.position;
-        if (endPointTransform != null) endPoint = endPointTransform.position;
+        //if (endPointTransform != null) endPoint = endPointTransform.position;
+        endPoints.Clear();
+        usedEndPointIndices.Clear();
+        if (endPointTransform != null && endPointTransform.Length > 0)
+        {
+            foreach (var endTransform in endPointTransform)
+            {
+                if (endTransform != null)
+                    endPoints.Add(endTransform.position);
+            }
+        }
 
         //清空舊的 Waypoints
         waypoints.Clear();
-
-        // //添加 Startpoint
-        // if(startPoint != null)
-        // {
-        //     waypoints.Add(startPoint.position);
-        //     Debug.Log($"Start added at position: {startPoint.position}");
-        // }
 
         //添加 WaypointsList
         if(targetPoints != null && targetPoints.Length > 0)
@@ -89,13 +77,6 @@ public class WaypointManager : MonoBehaviour
             }
         }
 
-        // //添加 Endpoint
-        // if(endPoint != null)
-        // {
-        //     waypoints.Add(endPoint.position);
-        //     Debug.Log($"Waypoint added at position: {endPoint.position}");
-        // }
-
         //通知更新
         OnWaypointsUpdated?.Invoke();
 
@@ -106,15 +87,6 @@ public class WaypointManager : MonoBehaviour
 
     public void AddWaypoint(Vector3 position, string tag)
     {
-        // // 根據 Tag 添加到對應的列表
-        // if (tag == "load")
-        // {
-        //     loadPoints.Add(position);
-        // }
-        // else if (tag == "unload")
-        // {
-        //     unloadPoints.Add(position);
-        // }
 
         waypoints.Add(position); // 添加到主列表
 
@@ -129,17 +101,60 @@ public class WaypointManager : MonoBehaviour
 
      public Vector3 GetStartPoint()
     {
-        return startPoint;
+        if (startPoints.Count == 0)
+            return Vector3.zero;
+
+        List<int> availableIndices = new List<int>();
+        for (int i = 0; i < startPoints.Count; i++)
+        {
+            if (!usedStartPointIndices.Contains(i))
+                availableIndices.Add(i);
+        }
+
+        if (availableIndices.Count == 0)
+        {
+            usedStartPointIndices.Clear();
+            availableIndices.AddRange(System.Linq.Enumerable.Range(0, startPoints.Count));
+        }
+
+        int selectedIndex = availableIndices[UnityEngine.Random.Range(0, availableIndices.Count)];
+        usedStartPointIndices.Add(selectedIndex);
+        return startPoints[selectedIndex];
     }
 
     public Vector3 GetEndPoint()
     {
-        return endPoint;
+
+        if (endPoints.Count == 0)
+            return Vector3.zero;
+
+        List<int> availableIndices = new List<int>();
+        for (int i = 0; i < endPoints.Count; i++)
+        {
+            if (!usedEndPointIndices.Contains(i))
+                availableIndices.Add(i);
+        }
+
+        if (availableIndices.Count == 0)
+        {
+            usedEndPointIndices.Clear();
+            availableIndices.AddRange(System.Linq.Enumerable.Range(0, endPoints.Count));
+        }
+
+        int selectedIndex = availableIndices[UnityEngine.Random.Range(0, availableIndices.Count)];
+        usedEndPointIndices.Add(selectedIndex);
+        return endPoints[selectedIndex];
+    //    if (endPoints.Count == 0)
+    //         return Vector3.zero;
+    //     int randomIndex = UnityEngine.Random.Range(0, endPoints.Count);
+    //     return endPoints[randomIndex];
     }
 
 
     public float[,] GenerateFullDistanceMatrix()
     {
+        Vector3 startPoint = GetStartPoint();
+        Vector3 endPoint = GetEndPoint();
         List<Vector3> allPoints = new List<Vector3> { startPoint };
         allPoints.AddRange(waypoints);
         allPoints.Add(endPoint);
@@ -199,11 +214,11 @@ public class WaypointManager : MonoBehaviour
     private void DisplayWaypoints()
     {
         Debug.Log("Current Waypoints:");
-        Debug.Log($"Start Point: {startPoint}");
+        Debug.Log($"Start Point: {startPoints}");
         for (int i = 0; i < waypoints.Count; i++)
         {
             Debug.Log($"Waypoint {i + 1}: {waypoints[i]}");
         }
-        Debug.Log($"End Point: {endPoint}");
+        Debug.Log($"End Point: {endPoints}");
     }
 }
