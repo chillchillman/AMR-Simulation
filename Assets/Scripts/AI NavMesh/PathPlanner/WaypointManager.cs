@@ -104,7 +104,23 @@ public class WaypointManager : MonoBehaviour
 
     }
 
+    public void AddWaypoint(Vector3 position, string tag)
+    {
+        // // 根據 Tag 添加到對應的列表
+        // if (tag == "load")
+        // {
+        //     loadPoints.Add(position);
+        // }
+        // else if (tag == "unload")
+        // {
+        //     unloadPoints.Add(position);
+        // }
 
+        waypoints.Add(position); // 添加到主列表
+
+        OnWaypointsUpdated?.Invoke();
+        Debug.Log($"Waypoint added: {position} with tag {tag}");
+    }
 
     public List<Vector3> GetWaypointPositions()
     {

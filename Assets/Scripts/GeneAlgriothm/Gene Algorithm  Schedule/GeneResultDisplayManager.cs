@@ -8,7 +8,7 @@ public class GeneResultDisplayManager : MonoBehaviour
 {
     public TextMeshProUGUI resultText;
     private bool isTextVisible = false;
-    public float typingSpeed = 0.05f; // 每個字符的顯示速度
+    public float typingSpeed = 0.0001f; // 每個字符的顯示速度
 
     public void DisplayResults(int amrCount, DNA optimalDNA, float totalDistance)
     {

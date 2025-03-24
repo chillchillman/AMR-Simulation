@@ -153,31 +153,47 @@ public class PopulationManager : MonoBehaviour {
     }
 
     List<DNA> BreedNewPopulation(List<DNA> sortedPopulation) {
-        List<DNA> newPopulation = new List<DNA>();
-        int half = sortedPopulation.Count / 2;
+    List<DNA> newPopulation = new List<DNA>();
 
-        // 確保有足夠個體進行繁殖
-        if (sortedPopulation.Count < 2) {
-            Debug.LogWarning("Population size is too small for breeding.");
-            return sortedPopulation;
+    int eliteCount = sortedPopulation.Count / 5; // 保留前 20% 高適應度個體
+    float totalFitness = sortedPopulation.Sum(dna => dna.Fitness);
+
+    // **步驟 1：菁英保留**
+    newPopulation.AddRange(sortedPopulation.Take(eliteCount)); 
+
+    // **步驟 2：輪盤法選擇其餘個體進行繁殖**
+    for (int i = eliteCount; i < sortedPopulation.Count; i++) {
+        DNA parent1 = RouletteSelection(sortedPopulation, totalFitness);
+        DNA parent2 = RouletteSelection(sortedPopulation, totalFitness);
+
+        DNA offspring = new DNA(parent1);
+        offspring.Combine(parent1, parent2);
+
+        // **步驟 3：突變機制**
+        if (Random.Range(0, 100) < 3) {  // 3% 機率發生突變
+            offspring.Mutate();
         }
 
-        for (int i = half; i < sortedPopulation.Count; i++) {
-            DNA parent1 = sortedPopulation[i];
-            DNA parent2 = sortedPopulation[i - 1];
-
-            DNA offspring = new DNA(parent1);
-            offspring.Combine(parent1, parent2);
-
-            if (Random.Range(0, 100) < 1) {
-                offspring.Mutate();
-            }
-
-            newPopulation.Add(offspring);
-        }
-
-        return newPopulation;
+        newPopulation.Add(offspring);
     }
+
+    return newPopulation;
+}
+
+// **輪盤法選擇函數**
+DNA RouletteSelection(List<DNA> population, float totalFitness) {
+    float randomValue = Random.Range(0, totalFitness);
+    float cumulative = 0;
+
+    foreach (var dna in population) {
+        cumulative += dna.Fitness;
+        if (cumulative >= randomValue) {
+            return dna;
+        }
+    }
+    return population.Last(); // 預防錯誤
+}
+
 
     List<DNA> InitializePopulation(int amrCount) {
         if (populationSize < 2) {
